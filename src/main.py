@@ -6,19 +6,15 @@ from config import *
 from button import Button
 from blockfield import BlockField
 from tetromino import Tetromino, TETROMINO_SHAPES, TETROMINO_COLORS
-
-
-# Get a random Tetromino
-def create_new_tetromino():
-    shape_name = random.choice(list(TETROMINO_SHAPES.keys()))
-    shape = TETROMINO_SHAPES[shape_name]
-    color = TETROMINO_COLORS[shape_name]
-    return Tetromino(shape, color)
+from scoreboard import ScoreBoard
+from tetromino_queue import TetrominoQueue
 
 
 def play():
     block_field = BlockField()
-    curr_tetromino = create_new_tetromino()
+    score_board = ScoreBoard()
+    tetromino_queue = TetrominoQueue()
+    curr_tetromino = tetromino_queue.get_next_piece()
     dt = 0
 
     while True:
@@ -29,24 +25,33 @@ def play():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     pause()
+                if event.key == pygame.K_LSHIFT and tetromino_queue.can_hold:
+                    curr_tetromino = tetromino_queue.hold_current_piece(curr_tetromino)
+                    curr_tetromino.row = 0  # Reset position for the new/held piece
+                    curr_tetromino.col = curr_tetromino.calculate_start_column()
+                    tetromino_queue.can_hold = False
 
         SCREEN.fill((0, 0, 0))
 
         if block_field.is_game_over():
-            if game_over() == "restart":
-                play()
-                return
-        
+            game_over()
+
         # Update and draw the current tetromino
         if curr_tetromino.update(dt, block_field):
             # If update returns True, we need a new piece
-            curr_tetromino = create_new_tetromino()
-        
+            curr_tetromino = tetromino_queue.get_next_piece()
+
+        # Clear completed lines
+        lines_cleared = block_field.clear_lines()
+        score_board.update_score(lines_cleared)
+
         # Draw game elements
         block_field.draw(SCREEN)
         curr_tetromino.draw(SCREEN, block_field)
+        score_board.draw(SCREEN)
+        tetromino_queue.draw(SCREEN)
 
-        dt = GAME_CLOCK.tick(30) / 1000
+        dt = GAME_CLOCK.tick(15) / 1000
         pygame.display.flip()
         pygame.display.update()
 
@@ -140,7 +145,6 @@ def game_over():
                     sys.exit()
 
         pygame.display.update()
-
 
 
 def main():

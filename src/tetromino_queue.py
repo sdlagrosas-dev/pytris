@@ -20,6 +20,8 @@ class TetrominoQueue:
     def get_next_piece(self):
         next_piece = self.queue.pop(0)
         self.queue.append(self._create_new_tetromino())
+        next_piece.row = 0
+        next_piece.col = next_piece.calculate_start_column()
         self.can_hold = True
         return next_piece
     

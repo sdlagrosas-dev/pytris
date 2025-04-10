@@ -79,5 +79,13 @@ class BlockField(pygame.sprite.Sprite):
                     )
 
     def is_game_over(self):
-        """Check if the game is over (i.e., a block has reached the top)"""
-        return any(block for row in self.blocks[:1] for block in row)
+        """Check if the game is over (i.e., no space for new pieces)"""
+        # Check the top 4 rows (height of tallest piece) for any existing blocks
+        # that would prevent a new piece from being placed
+        check_height = 4
+        for row in range(check_height):
+            for col in range(self.GRID_WIDTH):
+                if self.blocks[row][col]:
+                    # If there are blocks in the spawn area, game is over
+                    return True
+        return False

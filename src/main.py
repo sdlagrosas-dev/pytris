@@ -27,19 +27,25 @@ def play():
                     pause()
                 if event.key == pygame.K_LSHIFT and tetromino_queue.can_hold:
                     curr_tetromino = tetromino_queue.hold_current_piece(curr_tetromino)
-                    curr_tetromino.row = 0  # Reset position for the new/held piece
+                    curr_tetromino.row = 0
                     curr_tetromino.col = curr_tetromino.calculate_start_column()
+                    # Check if the held piece can be placed
+                    if not curr_tetromino.can_place(block_field):
+                        game_over()
                     tetromino_queue.can_hold = False
 
         SCREEN.fill((0, 0, 0))
 
-        if block_field.is_game_over():
-            game_over()
-
         # Update and draw the current tetromino
         if curr_tetromino.update(dt, block_field):
-            # If update returns True, we need a new piece
+            # Current piece has landed, check game over before spawning new piece
+            if block_field.is_game_over():
+                game_over()
+            # Spawn new piece
             curr_tetromino = tetromino_queue.get_next_piece()
+            # Check if the new piece can be placed
+            if not curr_tetromino.can_place(block_field):
+                game_over()
 
         # Clear completed lines
         lines_cleared = block_field.clear_lines()

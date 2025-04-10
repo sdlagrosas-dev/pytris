@@ -63,6 +63,43 @@ class Tetromino(pygame.sprite.Sprite):
                         return False
         return True
 
+    def can_place(self, block_field):
+        """Check if the piece can be placed at its current position"""
+        for y in range(len(self.shape)):
+            for x in range(len(self.shape[y])):
+                if self.shape[y][x]:
+                    if not block_field.is_valid_position(self.row + y, self.col + x):
+                        return False
+                    if block_field.blocks[self.row + y][self.col + x]:
+                        return False
+        return True
+
+    def find_drop_position(self, block_field):
+        """Calculate the lowest possible position for the piece"""
+        test_row = self.row
+        while True:
+            next_row = test_row + 1
+            can_move = True
+            
+            # Check if next position would be valid
+            for y in range(len(self.shape)):
+                for x in range(len(self.shape[y])):
+                    if self.shape[y][x]:
+                        if not block_field.is_valid_position(next_row + y, self.col + x):
+                            can_move = False
+                            break
+                        if block_field.blocks[next_row + y][self.col + x]:
+                            can_move = False
+                            break
+                if not can_move:
+                    break
+            
+            if not can_move:
+                break
+            test_row = next_row
+            
+        return test_row
+
     def update(self, dt, block_field):
         """Update piece position based on time and input"""
         self.fall_time += dt
@@ -87,11 +124,11 @@ class Tetromino(pygame.sprite.Sprite):
                 self.rotation_cooldown = 0
 
         if keys[pygame.K_SPACE]:
-            # Hard drop
-            while self.move(1, 0, block_field):
-                pass
-            # Lock the piece in place
+            # Hard drop - calculate final position and place piece there
+            final_row = self.find_drop_position(block_field)
+            self.row = final_row
             block_field.add_piece(self, self.row, self.col)
+            return True  # Signal that we need a new piece
 
         # Handle falling
         if self.fall_time >= self.fall_speed:

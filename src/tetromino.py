@@ -11,7 +11,8 @@ class Tetromino(pygame.sprite.Sprite):
         self.col = self.calculate_start_column()
         self.fall_time = 0
         self.fall_speed = 1.0  # Seconds per grid cell
-        self.rotation_cooldown = 0  # Cooldown for rotation
+        self.rotation_cd = 0  # Cooldown for rotation
+        self.hard_drop_cd = 0.2  # Cooldown for hard drop
 
     def calculate_start_column(self):
         """Calculate starting column to center the piece"""
@@ -80,12 +81,14 @@ class Tetromino(pygame.sprite.Sprite):
         while True:
             next_row = test_row + 1
             can_move = True
-            
+
             # Check if next position would be valid
             for y in range(len(self.shape)):
                 for x in range(len(self.shape[y])):
                     if self.shape[y][x]:
-                        if not block_field.is_valid_position(next_row + y, self.col + x):
+                        if not block_field.is_valid_position(
+                            next_row + y, self.col + x
+                        ):
                             can_move = False
                             break
                         if block_field.blocks[next_row + y][self.col + x]:
@@ -93,11 +96,11 @@ class Tetromino(pygame.sprite.Sprite):
                             break
                 if not can_move:
                     break
-            
+
             if not can_move:
                 break
             test_row = next_row
-            
+
         return test_row
 
     def update(self, dt, block_field):
@@ -115,20 +118,24 @@ class Tetromino(pygame.sprite.Sprite):
         else:
             self.fall_speed = 1.0
 
-        if (keys[pygame.K_UP] or keys[pygame.K_w]) and self.rotation_cooldown <= 0:
+        if (keys[pygame.K_UP] or keys[pygame.K_w]) and self.rotation_cd <= 0:
             if self.rotate(block_field):
-                self.rotation_cooldown = 0.1
+                self.rotation_cd = 0.1
         else:
-            self.rotation_cooldown -= dt
-            if self.rotation_cooldown < 0:
-                self.rotation_cooldown = 0
+            self.rotation_cd -= dt
+            if self.rotation_cd < 0:
+                self.rotation_cd = 0
 
-        if keys[pygame.K_SPACE]:
+        if keys[pygame.K_SPACE] and self.hard_drop_cd <= 0:
             # Hard drop - calculate final position and place piece there
             final_row = self.find_drop_position(block_field)
             self.row = final_row
             block_field.add_piece(self, self.row, self.col)
             return True  # Signal that we need a new piece
+        else:
+            self.hard_drop_cd -= dt
+            if self.hard_drop_cd < 0:
+                self.hard_drop_cd = 0
 
         # Handle falling
         if self.fall_time >= self.fall_speed:

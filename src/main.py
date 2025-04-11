@@ -10,10 +10,10 @@ from scoreboard import ScoreBoard
 from tetromino_queue import TetrominoQueue
 
 
-def play():
+def play(difficulty_profile):
     block_field = BlockField()
     score_board = ScoreBoard()
-    tetromino_queue = TetrominoQueue()
+    tetromino_queue = TetrominoQueue(difficulty_profile=difficulty_profile)
     curr_tetromino = tetromino_queue.get_next_piece()
     dt = 0
 
@@ -26,7 +26,7 @@ def play():
                 if event.key == pygame.K_ESCAPE:
                     pause()
                 if event.key == pygame.K_LSHIFT and tetromino_queue.can_hold:
-                    curr_tetromino = tetromino_queue.hold_current_piece(curr_tetromino)
+                    curr_tetromino = tetromino_queue.hold_current_piece(curr_tetromino, score_board.score, difficulty_profile)
                     curr_tetromino.row = 0
                     curr_tetromino.col = curr_tetromino.calculate_start_column()
                     # Check if the held piece can be placed
@@ -37,12 +37,12 @@ def play():
         SCREEN.fill((0, 0, 0))
 
         # Update and draw the current tetromino
-        if curr_tetromino.update(dt, block_field):
+        if curr_tetromino.update(dt, block_field, score_board.score):
             # Current piece has landed, check game over before spawning new piece
             if block_field.is_game_over():
                 game_over()
             # Spawn new piece
-            curr_tetromino = tetromino_queue.get_next_piece()
+            curr_tetromino = tetromino_queue.get_next_piece(score_board.score)
             # Check if the new piece can be placed
             if not curr_tetromino.can_place(block_field):
                 game_over()
@@ -59,6 +59,62 @@ def play():
 
         dt = GAME_CLOCK.tick(15) / 1000
         pygame.display.flip()
+        pygame.display.update()
+
+
+def difficulty():
+    from difficulty_profile import BEGINNER, INTERMEDIATE, EXPERT
+    
+    difficulty_text = get_font(100).render("Difficulty", True, "#b68f40")
+    difficulty_rect = difficulty_text.get_rect(center=(SCREEN_WIDTH // 2, 100))
+
+    beginner_button = Button(
+        image=None,
+        pos=(SCREEN_WIDTH // 2, 250),
+        text_input=BEGINNER.name,
+        font=get_font(75),
+        base_color="#d7fcd4",
+        hovering_color="White",
+    )
+    intermediate_button = Button(
+        image=None,
+        pos=(SCREEN_WIDTH // 2, 400),
+        text_input=INTERMEDIATE.name,
+        font=get_font(75),
+        base_color="#d7fcd4",
+        hovering_color="White",
+    )
+    expert_button = Button(
+        image=None,
+        pos=(SCREEN_WIDTH // 2, 550),
+        text_input=EXPERT.name,
+        font=get_font(75),
+        base_color="#d7fcd4",
+        hovering_color="White",
+    )
+
+    while True:
+        SCREEN.blit(BG_MENU, (0, 0))
+        SCREEN.blit(difficulty_text, difficulty_rect)
+
+        menu_mouse_pos = pygame.mouse.get_pos()
+
+        for button in [beginner_button, intermediate_button, expert_button]:
+            button.changeColor(menu_mouse_pos)
+            button.update(SCREEN)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if beginner_button.checkForInput(menu_mouse_pos):
+                    play(BEGINNER)
+                if intermediate_button.checkForInput(menu_mouse_pos):
+                    play(INTERMEDIATE)
+                if expert_button.checkForInput(menu_mouse_pos):
+                    play(EXPERT)
+
         pygame.display.update()
 
 
@@ -108,7 +164,6 @@ def pause():
 
 
 def game_over():
-
     game_over_text = get_font(100).render("GAME OVER", True, "#b68f40")
     game_over_rect = game_over_text.get_rect(center=(SCREEN_WIDTH // 2, 150))
 
@@ -145,7 +200,7 @@ def game_over():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if replay_button.checkForInput(menu_mouse_pos):
-                    play()
+                    difficulty()  # Changed from play() to difficulty()
                 if quit_button.checkForInput(menu_mouse_pos):
                     pygame.quit()
                     sys.exit()
@@ -201,7 +256,7 @@ def main():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if play_button.checkForInput(menu_mouse_pos):
-                    play()
+                    difficulty()  # Changed from play() to difficulty()
                 if options_button.checkForInput(menu_mouse_pos):
                     pass
                     # options()

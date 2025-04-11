@@ -1,23 +1,54 @@
 import pygame
+import math
 from config import *
+from difficulty_profile import DifficultyProfile
 
 
 class Tetromino(pygame.sprite.Sprite):
-    def __init__(self, shape, color):
+    def __init__(self, shape, color, score, profile):
         super().__init__()
         self.shape = shape
         self.color = color
         self.row = 0  # Grid position
         self.col = self.calculate_start_column()
         self.fall_time = 0
-        self.fall_speed = 1.0  # Seconds per grid cell
-        self.rotation_cd = 0  # Cooldown for rotation
-        self.hard_drop_cd = 0.2  # Cooldown for hard drop
+        self.BASE_FALL_SPEED = 1.0  # Base seconds per grid cell
+        self.BASE_ROTATION_CD = 0.2  # Base cooldown for rotation
+        self.BASE_HARD_DROP_CD = 0.5  # Base cooldown for hard drop
+        self.rotation_cd = 0
+        self.difficulty_multiplier = self._calculate_difficulty_multiplier(score, profile)
+        self.fall_speed = self.BASE_FALL_SPEED * self.difficulty_multiplier
+        self.hard_drop_cd = max(
+            self.BASE_HARD_DROP_CD * self.difficulty_multiplier, 0.1
+        )  # Hard drop cooldown
 
     def calculate_start_column(self):
         """Calculate starting column to center the piece"""
         width = len(self.shape[0])
         return (10 - width) // 2  # 10 is grid width
+
+    def _calculate_difficulty_multiplier(self, current_score: int, profile: DifficultyProfile):
+        if not profile:  # Handle case when no difficulty profile is provided
+            return BLOCK_START_SPEED
+
+        difficulty_start_score = profile.difficulty_start_score
+        max_speed_score = profile.max_speed_score
+
+        if current_score <= difficulty_start_score:
+            return BLOCK_START_SPEED
+        else:
+            # Ensure score range is positive to avoid division by zero
+            score_range = max(1, max_speed_score - difficulty_start_score)
+            speed_range = BLOCK_START_SPEED - BLOCK_MAX_SPEED
+
+            progress = (current_score - difficulty_start_score) / score_range
+            clamped_progress = max(0.0, min(1.0, progress))
+
+            speed_reduction = clamped_progress * speed_range
+            fall_speed = BLOCK_START_SPEED - speed_reduction
+
+            # Final safety clamp
+            return max(BLOCK_MAX_SPEED, fall_speed)
 
     def move(self, d_row, d_col, block_field):
         """Try to move the piece by the given delta. Returns True if successful."""
@@ -103,7 +134,7 @@ class Tetromino(pygame.sprite.Sprite):
 
         return test_row
 
-    def update(self, dt, block_field):
+    def update(self, dt, block_field, score=0):
         """Update piece position based on time and input"""
         self.fall_time += dt
 
@@ -116,11 +147,13 @@ class Tetromino(pygame.sprite.Sprite):
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:
             self.fall_speed = 0.1  # Fall faster while pressing down
         else:
-            self.fall_speed = 1.0
+            self.fall_speed = self.BASE_FALL_SPEED * self.difficulty_multiplier
 
         if (keys[pygame.K_UP] or keys[pygame.K_w]) and self.rotation_cd <= 0:
             if self.rotate(block_field):
-                self.rotation_cd = 0.1
+                self.rotation_cd = max(
+                    self.BASE_ROTATION_CD * self.difficulty_multiplier, 0.1
+                )
         else:
             self.rotation_cd -= dt
             if self.rotation_cd < 0:

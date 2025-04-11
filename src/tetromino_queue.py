@@ -28,25 +28,33 @@ class TetrominoQueue:
         self.can_hold = True
         return next_piece
 
-    def hold_current_piece(self, current_piece: Tetromino, score: int, profile: DifficultyProfile):
+    def hold_current_piece(
+        self, current_piece: Tetromino, score: int, profile: DifficultyProfile
+    ):
         if not self.can_hold:
             return current_piece
 
         self.can_hold = False
         if self.hold_piece is None:
             # First hold
-            self.hold_piece = Tetromino(current_piece.shape, current_piece.color, score, profile)
+            self.hold_piece = Tetromino(
+                current_piece.shape, current_piece.color, score, profile
+            )
             return self.get_next_piece()
         else:
             # Swap current and held piece
             temp = Tetromino(current_piece.shape, current_piece.color, score, profile)
-            current_piece = Tetromino(self.hold_piece.shape, self.hold_piece.color, score, profile)
+            current_piece = Tetromino(
+                self.hold_piece.shape, self.hold_piece.color, score, profile
+            )
             self.hold_piece = temp
             return current_piece
 
-    def _draw_preview(self, screen, piece: Tetromino, x: int, y: int, cell_size: int = 20):
+    def _draw_preview(
+        self, screen, piece: Tetromino, x: int, y: int, cell_size: int = 20
+    ):
         shape = piece.shape
-        
+
         # Draw each cell of the tetromino
         for row_idx, row in enumerate(shape):
             for col_idx, cell in enumerate(row):

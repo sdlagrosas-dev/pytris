@@ -1,27 +1,8 @@
 class DifficultyProfile:
-    """
-    Attributes
-    ----------
-    - name: str
-        The name of the difficulty profile.
-    - difficulty_start_score: int
-        The starting score when the difficulty increases.
-    - max_speed_score: int
-        The maximum score for speed.
-    """
 
     def __init__(self, name: str, difficulty_start_score: int, max_speed_score: int):
         """
         Initializes the DifficultyProfile with a name, difficulty start score, and maximum speed score.
-
-        Parameters
-        ----------
-        - name: str
-            The name of the difficulty profile.
-        - difficulty_start_score: int
-            The starting score when the difficulty increases.
-        - max_speed_score: int
-            The maximum score for speed.
         """
         self.name = name
         self.difficulty_start_score = difficulty_start_score

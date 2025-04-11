@@ -1,5 +1,4 @@
 import pygame
-import math
 from config import *
 from difficulty_profile import DifficultyProfile
 
@@ -16,7 +15,9 @@ class Tetromino(pygame.sprite.Sprite):
         self.BASE_ROTATION_CD = 0.2  # Base cooldown for rotation
         self.BASE_HARD_DROP_CD = 0.5  # Base cooldown for hard drop
         self.rotation_cd = 0
-        self.difficulty_multiplier = self._calculate_difficulty_multiplier(score, profile)
+        self.difficulty_multiplier = self._calculate_difficulty_multiplier(
+            score, profile
+        )
         self.fall_speed = self.BASE_FALL_SPEED * self.difficulty_multiplier
         self.hard_drop_cd = max(
             self.BASE_HARD_DROP_CD * self.difficulty_multiplier, 0.1
@@ -27,7 +28,9 @@ class Tetromino(pygame.sprite.Sprite):
         width = len(self.shape[0])
         return (10 - width) // 2  # 10 is grid width
 
-    def _calculate_difficulty_multiplier(self, current_score: int, profile: DifficultyProfile):
+    def _calculate_difficulty_multiplier(
+        self, current_score: int, profile: DifficultyProfile
+    ):
         if not profile:  # Handle case when no difficulty profile is provided
             return BLOCK_START_SPEED
 

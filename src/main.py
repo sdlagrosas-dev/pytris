@@ -1,6 +1,5 @@
 import pygame
 import sys
-import random
 
 from config import *
 from button import Button
@@ -26,7 +25,9 @@ def play(difficulty_profile):
                 if event.key == pygame.K_ESCAPE:
                     pause()
                 if event.key == pygame.K_LSHIFT and tetromino_queue.can_hold:
-                    curr_tetromino = tetromino_queue.hold_current_piece(curr_tetromino, score_board.score, difficulty_profile)
+                    curr_tetromino = tetromino_queue.hold_current_piece(
+                        curr_tetromino, score_board.score, difficulty_profile
+                    )
                     curr_tetromino.row = 0
                     curr_tetromino.col = curr_tetromino.calculate_start_column()
                     # Check if the held piece can be placed
@@ -64,7 +65,7 @@ def play(difficulty_profile):
 
 def difficulty():
     from difficulty_profile import BEGINNER, INTERMEDIATE, EXPERT
-    
+
     difficulty_text = get_font(100).render("Difficulty", True, "#b68f40")
     difficulty_rect = difficulty_text.get_rect(center=(SCREEN_WIDTH // 2, 100))
 

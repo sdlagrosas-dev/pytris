@@ -23,7 +23,7 @@ def play(difficulty_profile):
                 sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    pause()
+                    pause(score_board)
                 if event.key == pygame.K_LSHIFT and tetromino_queue.can_hold:
                     curr_tetromino = tetromino_queue.hold_current_piece(
                         curr_tetromino, score_board.score, difficulty_profile
@@ -32,21 +32,21 @@ def play(difficulty_profile):
                     curr_tetromino.col = curr_tetromino.calculate_start_column()
                     # Check if the held piece can be placed
                     if not curr_tetromino.can_place(block_field):
-                        game_over()
+                        game_over(score_board)
                     tetromino_queue.can_hold = False
 
         SCREEN.fill((0, 0, 0))
 
         # Update and draw the current tetromino
-        if curr_tetromino.update(dt, block_field, score_board.score):
+        if curr_tetromino.update(dt, block_field):
             # Current piece has landed, check game over before spawning new piece
             if block_field.is_game_over():
-                game_over()
+                game_over(score_board)
             # Spawn new piece
             curr_tetromino = tetromino_queue.get_next_piece(score_board.score)
             # Check if the new piece can be placed
             if not curr_tetromino.can_place(block_field):
-                game_over()
+                game_over(score_board)
 
         # Clear completed lines
         lines_cleared = block_field.clear_lines()
@@ -119,7 +119,7 @@ def difficulty():
         pygame.display.update()
 
 
-def pause():
+def pause(score_board):
     pause_text = get_font(100).render("PAUSED", True, "#b68f40")
     pause_rect = pause_text.get_rect(center=(SCREEN_WIDTH // 2, 150))
 
@@ -131,10 +131,18 @@ def pause():
         base_color="#d7fcd4",
         hovering_color="White",
     )
-    quit_button = Button(
-        image=pygame.image.load("assets/Quit Rect.png"),
+    retry_button = Button(
+        image=None,
         pos=(SCREEN_WIDTH // 2, 450),
-        text_input="QUIT",
+        text_input="RETRY",
+        font=get_font(75),
+        base_color="#d7fcd4",
+        hovering_color="White",
+    )
+    forfeit_button = Button(
+        image=None,
+        pos=(SCREEN_WIDTH // 2, 600),
+        text_input="FORFEIT",
         font=get_font(75),
         base_color="#d7fcd4",
         hovering_color="White",
@@ -146,7 +154,7 @@ def pause():
         SCREEN.blit(pause_text, pause_rect)
         menu_mouse_pos = pygame.mouse.get_pos()
 
-        for button in [resume_button, quit_button]:
+        for button in [resume_button, retry_button, forfeit_button]:
             button.changeColor(menu_mouse_pos)
             button.update(SCREEN)
 
@@ -157,28 +165,32 @@ def pause():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if resume_button.checkForInput(menu_mouse_pos):
                     return
-                if quit_button.checkForInput(menu_mouse_pos):
-                    pygame.quit()
-                    sys.exit()
+                if retry_button.checkForInput(menu_mouse_pos):
+                    difficulty()
+                if forfeit_button.checkForInput(menu_mouse_pos):
+                    game_over(score_board)
 
         pygame.display.update()
 
 
-def game_over():
+def game_over(score_board: ScoreBoard):
     game_over_text = get_font(100).render("GAME OVER", True, "#b68f40")
     game_over_rect = game_over_text.get_rect(center=(SCREEN_WIDTH // 2, 150))
 
-    replay_button = Button(
+    score_text = get_font(50).render(f"Score: {score_board.score}", True, "#b68f40")
+    score_rect = score_text.get_rect(center=(SCREEN_WIDTH // 2, 300))
+
+    retry_button = Button(
         image=None,
-        pos=(SCREEN_WIDTH // 2, 300),
-        text_input="REPLAY",
+        pos=(SCREEN_WIDTH // 2, 450),
+        text_input="RETRY",
         font=get_font(75),
         base_color="#d7fcd4",
         hovering_color="White",
     )
     quit_button = Button(
         image=pygame.image.load("assets/Quit Rect.png"),
-        pos=(SCREEN_WIDTH // 2, 450),
+        pos=(SCREEN_WIDTH // 2, 600),
         text_input="QUIT",
         font=get_font(75),
         base_color="#d7fcd4",
@@ -187,11 +199,12 @@ def game_over():
 
     while True:
         SCREEN.blit(BG_MENU, (0, 0))
-
         SCREEN.blit(game_over_text, game_over_rect)
+        SCREEN.blit(score_text, score_rect)
+
         menu_mouse_pos = pygame.mouse.get_pos()
 
-        for button in [replay_button, quit_button]:
+        for button in [retry_button, quit_button]:
             button.changeColor(menu_mouse_pos)
             button.update(SCREEN)
 
@@ -200,7 +213,7 @@ def game_over():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if replay_button.checkForInput(menu_mouse_pos):
+                if retry_button.checkForInput(menu_mouse_pos):
                     difficulty()  # Changed from play() to difficulty()
                 if quit_button.checkForInput(menu_mouse_pos):
                     pygame.quit()

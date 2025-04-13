@@ -5,7 +5,7 @@ by Samuel Darwin Lagrosas (sdlagrosas.dev)
 PygTris is a simple Tetris game implemented in Python using the Pygame library. The game features classic Tetris gameplay, including piece rotation, line clearing, and score tracking.
 
 ## How to play?
-1. Run the program.
+1. Run `PygTris` (or build the executable using `build.sh`)
 2. Use LEFT, DOWN, RIGHT or ASD to move the piece left, right and down.
 3. Press W to rotate the piece clockwise.
 4. Press SPACE key to drop the piece immediately.
@@ -24,7 +24,7 @@ PygTris is a simple Tetris game implemented in Python using the Pygame library. 
 3.  **Piece Management:** ✅
     *   Implement piece spawning. ✅
     *   Implement piece movement (left, right, down). ✅
-    *   Implement piece rotation.
+    *   Implement piece rotation. ✅
 4.  **Collision Detection:** ✅
     *   Detect collisions between the piece and the board. ✅
     *   Handle game over conditions. ✅
@@ -37,6 +37,8 @@ PygTris is a simple Tetris game implemented in Python using the Pygame library. 
     *   Display the score. ✅
     *   Handle user input (arrow keys, WASD, spacebar, enter). ✅
 7.  **Enhancements (Optional):**
-    *   Add sound effects.
-    *   Implement a level system.
     *   Add a "next piece" display. ✅
+    *   Add increasing difficulty levels. ✅
+    *   Implement a hold piece feature. ✅
+    *   Add a pause feature. ✅
+    *   Add sound effects.

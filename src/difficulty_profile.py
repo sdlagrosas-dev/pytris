@@ -12,6 +12,6 @@ class DifficultyProfile:
         return f"DifficultyProfile(name={self.name}, difficulty_start_score={self.difficulty_start_score}, max_speed_score={self.max_speed_score})"
 
 
-BEGINNER = DifficultyProfile("NOVICE", 5000, 45000)
-INTERMEDIATE = DifficultyProfile("MEDIUM", 2500, 22500)
-EXPERT = DifficultyProfile("MAKE 'EM RAIN", 1000, 8000)
+BEGINNER = DifficultyProfile("NOVICE", 4500, 40500)
+INTERMEDIATE = DifficultyProfile("MEDIUM", 2500, 20500)
+EXPERT = DifficultyProfile("MAKE 'EM RAIN", 800, 16000)

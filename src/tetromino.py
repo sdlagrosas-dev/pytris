@@ -137,7 +137,7 @@ class Tetromino(pygame.sprite.Sprite):
 
         return test_row
 
-    def update(self, dt, block_field, score=0):
+    def update(self, dt, block_field):
         """Update piece position based on time and input"""
         self.fall_time += dt
 
@@ -148,7 +148,7 @@ class Tetromino(pygame.sprite.Sprite):
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             self.move(0, 1, block_field)
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-            self.fall_speed = 0.1  # Fall faster while pressing down
+            self.fall_speed = 0.05  # Fall faster while pressing down
         else:
             self.fall_speed = self.BASE_FALL_SPEED * self.difficulty_multiplier
 

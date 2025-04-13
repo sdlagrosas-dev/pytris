@@ -15,7 +15,12 @@ class TetrominoQueue:
         self.font = pygame.font.Font("assets/font.ttf", 20)
 
     def _create_new_tetromino(self, score=0):
-        shape_name = random.choice(list(TETROMINO_SHAPES.keys()))
+        shape_choices = list(TETROMINO_SHAPES.keys())
+        if hasattr(self, "queue") and len(self.queue) > 0:
+            last_shape = self.queue[-1].shape
+            shape_name = random.choice([s for s in shape_choices if s != last_shape])
+        else:
+            shape_name = random.choice(shape_choices)
         shape = TETROMINO_SHAPES[shape_name]
         color = TETROMINO_COLORS[shape_name]
         return Tetromino(shape, color, score, self.difficulty_profile)

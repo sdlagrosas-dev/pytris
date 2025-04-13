@@ -17,8 +17,8 @@ class TetrominoQueue:
     def _create_new_tetromino(self, score=0):
         shape_choices = list(TETROMINO_SHAPES.keys())
         if hasattr(self, "queue") and len(self.queue) > 0:
-            last_shape = self.queue[-1].shape
-            shape_name = random.choice([s for s in shape_choices if s != last_shape])
+            curr_shapes = [t.shape for t in self.queue]
+            shape_name = random.choice([s for s in shape_choices if s not in curr_shapes])
         else:
             shape_name = random.choice(shape_choices)
         shape = TETROMINO_SHAPES[shape_name]

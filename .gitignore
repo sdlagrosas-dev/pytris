@@ -3,3 +3,4 @@ __pycache__/
 build/
 PygTris
 PygTris.spec
+*:Zone.Identifier

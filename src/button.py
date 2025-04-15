@@ -1,5 +1,7 @@
+import pygame
+
 class Button:
-    def __init__(self, image, pos, text_input, font, base_color, hovering_color):
+    def __init__(self, image, pos, text_input, font, base_color, hovering_color, glow=True):
         self.image = image
         self.x_pos = pos[0]
         self.y_pos = pos[1]
@@ -8,7 +10,14 @@ class Button:
         self.text_input = text_input
         self.text = self.font.render(self.text_input, True, self.base_color)
         if self.image is None:
-            self.image = self.text
+            if glow:
+                img_width = self.text.get_width() * 1.1
+                img_height = self.text.get_height() * 1.3
+                self.image = pygame.Surface((img_width, img_height), pygame.SRCALPHA)
+                # Fill with translucent dark grey
+                self.image.fill((50, 50, 50, 128))
+            else:
+                self.image = self.text
         self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
         self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
 

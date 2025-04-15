@@ -189,7 +189,7 @@ def game_over(score_board: ScoreBoard):
         hovering_color="White",
     )
     quit_button = Button(
-        image=pygame.image.load("assets/Quit Rect.png"),
+        image=None,
         pos=(SCREEN_WIDTH // 2, 600),
         text_input="QUIT",
         font=get_font(75),
@@ -238,7 +238,7 @@ def main():
         hovering_color="White",
     )
     options_button = Button(
-        image=pygame.image.load("assets/Options Rect.png"),
+        image=None,
         pos=(SCREEN_WIDTH // 2, 400),
         text_input="OPTIONS",
         font=get_font(75),
@@ -246,7 +246,7 @@ def main():
         hovering_color="White",
     )
     quit_button = Button(
-        image=pygame.image.load("assets/Quit Rect.png"),
+        image=None,
         pos=(SCREEN_WIDTH // 2, 550),
         text_input="QUIT",
         font=get_font(75),
